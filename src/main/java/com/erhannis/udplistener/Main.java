@@ -18,7 +18,18 @@ public class Main {
    */
   public static void main(String[] args) {
     try {
-      int port = Integer.parseInt(args[0]);
+      int port = 10001;
+      boolean cleanOutput = true;
+      boolean echo = false;
+      if (args.length > 0) {
+        port = Integer.parseInt(args[0]);
+      }
+      if (args.length > 1) {
+        cleanOutput = Boolean.parseBoolean(args[1]);
+      }
+      if (args.length > 2) {
+        echo = Boolean.parseBoolean(args[2]);
+      }
 
       // Create a socket to listen on the port.
       DatagramSocket dsocket = new DatagramSocket(port);
@@ -38,8 +49,16 @@ public class Main {
 
         // Convert the contents to a string, and display them
         String msg = new String(buffer, 0, packet.getLength());
-        System.out.println(packet.getAddress().getHostName() + ": " + msg);
+        if (cleanOutput) {
+          System.out.print(msg);
+        } else {
+          System.out.println(packet.getAddress().getHostName() + ": " + msg);
+        }
 
+        if (echo) {
+          dsocket.send(packet);
+        }
+        
         // Reset the length of the packet before reusing it.
         packet.setLength(buffer.length);
       }
